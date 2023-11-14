@@ -3,7 +3,7 @@ import { useState, useRef } from "react";
 import classes from "./AuthForm.module.css";
 
 const AuthForm = () => {
-  const[isLoading,setIsLoading]=useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const emailRef = useRef("");
   const passwordRef = useRef("");
   const [isLogin, setIsLogin] = useState(true);
@@ -16,39 +16,45 @@ const AuthForm = () => {
     const enteredEmail = emailRef.current.value;
     const enteredPassword = passwordRef.current.value;
     setIsLoading(true);
+    let url;
     if (isLogin) {
+      url =
+        "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyBqcpU3p6dLueO6WeEwF8iWiaYeVMCLWBk";
     } else {
+      url="https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyBqcpU3p6dLueO6WeEwF8iWiaYeVMCLWBk";
+    }
       fetch(
-        "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyBqcpU3p6dLueO6WeEwF8iWiaYeVMCLWBk"
-      ,
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          email: enteredEmail,
-          password: enteredPassword,
-          returnSecureToken: true
-        }),
-        headers: {
-          'Content-Type': 'application/json'
+        url,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            email: enteredEmail,
+            password: enteredPassword,
+            returnSecureToken: true,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
-      }).then(res=>{
+      ).then((res) => {
         setIsLoading(false);
-        if(res.ok){
-
-        }
-        else{
-          return res.json().then(data=>{
-            let errorMessage="Authentication Failed";
-            if(data && data.error && data.error.message )
-            {
-              errorMessage=data.error.message;
+        if (res.ok) {
+          return res.json();
+        } else {
+          return res.json().then((data) => {
+            let errorMessage = "Authentication Failed";
+            if (data && data.error && data.error.message) {
+              errorMessage = data.error.message;
             }
-            alert(errorMessage);
+            throw new Error(errorMessage);
           })
         }
+      }).then(data=>{
+        console.log(data);
+      }).catch(err=>{
+        alert(err.message);
       })
     }
-  };
 
   return (
     <section className={classes.auth}>
@@ -63,7 +69,9 @@ const AuthForm = () => {
           <input type="password" id="password" required ref={passwordRef} />
         </div>
         <div className={classes.actions}>
-          {!isLoading && <button>{isLogin ? "Login" : "Create Account"}</button>}
+          {!isLoading && (
+            <button>{isLogin ? "Login" : "Create Account"}</button>
+          )}
           {isLoading && <p>Loading...</p>}
           <button
             type="button"
