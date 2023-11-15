@@ -20,7 +20,7 @@ export const AuthContextProvider = (props) => {
         if(token){
           localStorage.removeItem('token');
         }
-      }, 3000);
+      }, 300000);
       return () => clearTimeout(timer);
     }, [token]);
    
